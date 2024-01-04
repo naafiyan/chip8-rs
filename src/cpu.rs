@@ -4,7 +4,9 @@ use crate::instr;
 pub const NUM_ROWS: u8 = 32;
 pub const NUM_COLS: u8 = 64;
 
-const CLOCK_CYCLE: Duration = Duration::from_millis(100);
+// 700 instructions per second
+// each instruction should then take 1000/700
+const CLOCK_CYCLE: Duration = Duration::from_nanos(1430);
 // 16 8-bit data registers named V0 to VF
 struct CPUState {
     v_regs: [u8; 16], // data regs
@@ -113,8 +115,16 @@ impl Chip8 {
         self.display[row as usize][col as usize]
     }
 
-    pub fn jump(&mut self, addr: u16) {
+    pub fn stack_push_pc(&mut self) {
+        self.stack_push(self.state.pc);
+    }
+
+    pub fn set_pc(&mut self, addr: u16) {
         self.state.pc = addr;
+    }
+
+    pub fn incr_pc(&mut self) {
+        self.state.pc += 2
     }
 
     pub fn set_index_reg(&mut self, addr: u16) {
