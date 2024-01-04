@@ -1,5 +1,6 @@
 mod cpu;
 mod instr;
+mod keyboard;
 mod rom;
 use cpu::{Chip8, NUM_COLS, NUM_ROWS};
 use sdl2::event::Event;
@@ -81,11 +82,15 @@ fn main() {
     'running: loop {
         for event in event_pump.poll_iter() {
             match event {
-                Event::Quit { .. }
-                | Event::KeyDown {
-                    keycode: Some(Keycode::Escape),
-                    ..
-                } => break 'running,
+                Event::Quit { .. } => break 'running,
+                Event::KeyDown {
+                    keycode: Some(kc), ..
+                } => match keyboard::get_hex_val(kc) {
+                    Some(hex_code) => {
+                        println!("pressing {:x?}", hex_code)
+                    }
+                    None => println!("Other key pressed"),
+                },
                 _ => {}
             }
         }
