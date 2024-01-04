@@ -233,14 +233,12 @@ fn op_d(opcode: u16, chip8: &mut Chip8) {
     chip8.set_reg(0xF, 0); // set VF to 0
 
     let i_reg = chip8.get_index_reg();
-    println!("i_reg: {:06x}", i_reg);
     let n = fourth_nib(&opcode);
     for i in 0..n {
         if y == NUM_ROWS {
             break;
         }
         let sprite_data: u8 = chip8.get_mem_data(i_reg + i);
-        println!("DEBUG: sprite_data: {:#06x}", sprite_data);
         // from most to least significant
         let mut x = x_start;
         for i in 0..8 {
@@ -249,9 +247,8 @@ fn op_d(opcode: u16, chip8: &mut Chip8) {
             }
             let curr_val = chip8.get_display(y, x);
             let curr_bit = (sprite_data >> (7 - i)) & 1;
-            println!("DEBUG: curr_bit: {:x?}", curr_bit);
 
-            // TODO: convert this to an easy XOR lol
+            // XOR with carry flag
             if (curr_val & curr_bit) > 0 {
                 chip8.set_display(y, x, 0);
                 chip8.set_reg(0xF, 1);
