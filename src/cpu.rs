@@ -45,26 +45,24 @@ impl Chip8 {
         // block off ram 000 to 1FF
     }
 
-    pub fn cpu_loop<F>(&mut self, callback: F)
+    pub fn cpu_loop<F>(&mut self, mut callback: F)
     where
-        F: Fn(&[[u8; NUM_COLS as usize]; NUM_ROWS as usize]),
+        F: FnMut(&[[u8; NUM_COLS as usize]; NUM_ROWS as usize]),
     {
-        loop {
-            if self.display_updated {
-                callback(&self.display);
-                self.display_updated = false;
-            }
-            // fetch
-            let curr_instr = {
-                let curr_instr_1 = self.ram[self.state.pc as usize] as u16;
-                let curr_instr_2 = self.ram[(self.state.pc + 1) as usize] as u16;
-                (curr_instr_1 << 8) | curr_instr_2
-            };
-            println!("current instr: {:x?}", curr_instr);
-            self.state.pc += 2;
-            instr::op(curr_instr, self);
-            sleep(CLOCK_CYCLE);
+        if self.display_updated {
+            callback(&self.display);
+            self.display_updated = false;
         }
+        // fetch
+        let curr_instr = {
+            let curr_instr_1 = self.ram[self.state.pc as usize] as u16;
+            let curr_instr_2 = self.ram[(self.state.pc + 1) as usize] as u16;
+            (curr_instr_1 << 8) | curr_instr_2
+        };
+        println!("current instr: {:x?}", curr_instr);
+        self.state.pc += 2;
+        instr::op(curr_instr, self);
+        sleep(CLOCK_CYCLE);
     }
 
     pub fn stack_push(&mut self, addr: u16) {
