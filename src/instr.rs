@@ -1,4 +1,4 @@
-use crate::cpu::{Chip8, NUM_COLS, NUM_ROWS};
+use crate::cpu::Chip8;
 use rand::Rng;
 
 fn first_nib(opcode: &u16) -> u16 {
@@ -79,7 +79,7 @@ fn op_0(opcode: u16, chip8: &mut Chip8) {
     // extract the last 3 nibbles
     let instr = second_byte(&opcode);
     match instr {
-        0xE0 => chip8.clear_display(),
+        0xE0 => chip8.display.clear_display(),
         0xEE => {
             // return
             let ret_addr = chip8.stack_pop();
@@ -226,34 +226,37 @@ fn op_c(opcode: u16, chip8: &mut Chip8) {
     chip8.set_reg(reg_x, r & nn);
 }
 fn op_d(opcode: u16, chip8: &mut Chip8) {
+    let num_rows = chip8.display.num_rows as u8;
+    let num_cols = chip8.display.num_cols as u8;
+
     let x_reg = second_nib(&opcode);
     let y_reg = third_nib(&opcode);
-    let x_start = chip8.get_reg(x_reg as u8) & (NUM_COLS - 1); // modulo 64
-    let mut y = chip8.get_reg(y_reg as u8) & (NUM_ROWS - 1);
+    let x_start = chip8.get_reg(x_reg as u8) & (num_cols - 1); // modulo 64
+    let mut y = chip8.get_reg(y_reg as u8) & (num_rows - 1);
     chip8.set_reg(0xF, 0); // set VF to 0
 
     let i_reg = chip8.get_index_reg();
     let n = fourth_nib(&opcode);
     for i in 0..n {
-        if y == NUM_ROWS {
+        if y == num_rows {
             break;
         }
         let sprite_data: u8 = chip8.get_mem_data(i_reg + i);
         // from most to least significant
         let mut x = x_start;
         for i in 0..8 {
-            if x == NUM_COLS {
+            if x == num_cols {
                 break;
             }
-            let curr_val = chip8.get_display(y, x);
+            let curr_val = chip8.display.get_display_buffer(y, x);
             let curr_bit = (sprite_data >> (7 - i)) & 1;
 
             // XOR with carry flag
             if (curr_val & curr_bit) > 0 {
-                chip8.set_display(y, x, 0);
+                chip8.display.set_display(y, x, 0);
                 chip8.set_reg(0xF, 1);
             } else if curr_bit > 0 && curr_val == 0 {
-                chip8.set_display(y, x, 1);
+                chip8.display.set_display(y, x, 1);
             }
             x += 1;
         }
