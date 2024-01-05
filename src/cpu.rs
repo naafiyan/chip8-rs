@@ -44,10 +44,8 @@ impl Chip8<'_> {
     }
 
     pub fn cpu_loop(&mut self) {
-        // if self.display_updated {
-        //     &self.display.display_update();
-        //     self.display_updated = false;
-        // }
+        // redraw display during every loop if needed
+        self.display.display_update();
         // fetch
         let curr_instr = {
             let curr_instr_1 = self.ram[self.state.pc as usize] as u16;

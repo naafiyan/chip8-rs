@@ -11,6 +11,7 @@ pub struct Display {
     pub num_rows: usize,
     pub num_cols: usize,
     buffer: Vec<Vec<u8>>,
+    should_update: bool,
 }
 
 fn canvas_init(canvas: &mut Canvas<Window>) {
@@ -27,6 +28,7 @@ impl Display {
             num_rows,
             num_cols,
             buffer: vec![vec![0; num_cols]; num_rows],
+            should_update: false,
         }
     }
 
@@ -58,18 +60,22 @@ impl Display {
         }
     }
     pub fn display_update(&mut self) {
-        self.pretty_print_display_grid();
-        self.draw_grid();
+        if self.should_update {
+            self.pretty_print_display_grid();
+            self.draw_grid();
+            self.should_update = false;
+        }
     }
 
     pub fn clear_display(&mut self) {
         self.buffer = vec![vec![0; self.num_cols]; self.num_rows];
         canvas_init(&mut self.canvas);
+        self.should_update = true;
     }
 
     pub fn set_display(&mut self, row: u8, col: u8, val: u8) {
         self.buffer[row as usize][col as usize] = val;
-        self.display_update();
+        self.should_update = true;
     }
 
     pub fn get_display_buffer(&mut self, row: u8, col: u8) -> u8 {
