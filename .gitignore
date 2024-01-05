@@ -1,3 +1,4 @@
 /target
 /chip8-roms
 .DS_Store
+log.out
