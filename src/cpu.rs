@@ -1,7 +1,9 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use std::{thread::sleep, time::Duration};
 
 use crate::display::{self};
-use crate::instr;
+use crate::{instr, key_input};
 
 // 700 instructions per second
 // each instruction should then take 1000/700
@@ -28,18 +30,21 @@ pub struct Chip8<'a> {
     ram: [u8; 4096], // 12 bit register for address, always mask by &= 0xFFF
     stack: Vec<u16>,
     pub display: &'a mut display::Display, // 32 rows, 64 columns, each can be 0 or 1 (on or off) - 0 is black, 1 is white
-    display_updated: bool,
+    key_input: Rc<RefCell<key_input::KeyInput>>,
 }
 
 // load in Chip8 memory starting at address 0x200
 impl Chip8<'_> {
-    pub fn new(display: &mut display::Display) -> Chip8 {
+    pub fn new<'a>(
+        display: &'a mut display::Display,
+        key_input: Rc<RefCell<key_input::KeyInput>>,
+    ) -> Chip8<'a> {
         Chip8 {
             state: CPUState::new(),
             ram: [0; 4096],
             stack: Vec::new(),
             display,
-            display_updated: false,
+            key_input,
         }
     }
 
@@ -120,5 +125,22 @@ impl Chip8<'_> {
 
     pub fn get_mem_data(&mut self, addr: u16) -> u8 {
         self.ram[addr as usize]
+    }
+
+    pub fn skip_key(&mut self, reg_num: u8, skip: bool) {
+        // determine if the key in reg_num is currently being held down
+        let reg_key = self.get_reg(reg_num);
+        let pressed_key = self.key_input.borrow().get_curr_pressed_key();
+
+        // TODO: make this better/correct
+        // if let Some(kc) = pressed_key {
+        //     if let Some(hex_code) = key_input::chip8_keycode_map(kc) {
+        //         if hex_code == reg_key && skip {
+        //             self.incr_pc();
+        //         } else if hex_code != reg_key && skip {
+        //             self.incr_pc()
+        //         }
+        //     }
+        // }
     }
 }

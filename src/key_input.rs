@@ -1,6 +1,25 @@
 use sdl2::keyboard::Keycode;
 
-pub fn get_hex_val(kc: Keycode) -> Option<u8> {
+pub struct KeyInput {
+    curr_pressed_key: Option<Keycode>,
+}
+
+impl KeyInput {
+    pub fn new() -> KeyInput {
+        KeyInput {
+            curr_pressed_key: None,
+        }
+    }
+
+    pub fn update_curr_pressed_key(&mut self, kc: Option<Keycode>) {
+        self.curr_pressed_key = kc;
+    }
+    pub fn get_curr_pressed_key(&self) -> Option<Keycode> {
+        self.curr_pressed_key
+    }
+}
+
+pub fn chip8_keycode_map(kc: Keycode) -> Option<u8> {
     match kc {
         Keycode::Num0 => Some(0x0),
         Keycode::Num1 => Some(0x1),

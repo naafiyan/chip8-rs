@@ -1,16 +1,15 @@
 mod cpu;
 mod display;
 mod instr;
-mod keyboard;
+mod key_input;
 mod rom;
 
 use cpu::Chip8;
 use sdl2::event::Event;
-use sdl2::pixels::Color;
+use std::cell::RefCell;
 use std::env;
+use std::rc::Rc;
 use std::time::Duration;
-
-use crate::display::Display;
 
 // defaults for NUM_ROWS and NUM_COLS in the display grid
 pub const NUM_ROWS: u8 = 32;
@@ -38,8 +37,10 @@ fn main() {
 
     // initialize the display
     let mut display = display::Display::new(NUM_ROWS as usize, NUM_COLS as usize, canvas);
+    // TODO: is there a better way to associate key presses?
+    let key_input = Rc::new(RefCell::new(key_input::KeyInput::new()));
 
-    let mut cpu = Chip8::new(&mut display);
+    let mut cpu = Chip8::new(&mut display, Rc::clone(&key_input));
     // load in rom file
     let instrs = rom::read_rom(format!("./chip8-roms/programs/{}", file_path));
     cpu.load_to_ram(&instrs);
@@ -49,14 +50,12 @@ fn main() {
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit { .. } => break 'running,
+                // update key_input's currently pressed key
                 Event::KeyDown {
                     keycode: Some(kc), ..
-                } => match keyboard::get_hex_val(kc) {
-                    Some(hex_code) => {
-                        println!("pressing {:x?}", hex_code)
-                    }
-                    None => println!("Other key pressed"),
-                },
+                } => key_input.borrow_mut().update_curr_pressed_key(Some(kc)),
+                // reset key being pressed
+                Event::KeyUp { .. } => key_input.borrow_mut().update_curr_pressed_key(None),
                 _ => {}
             }
         }

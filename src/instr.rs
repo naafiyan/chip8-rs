@@ -263,5 +263,38 @@ fn op_d(opcode: u16, chip8: &mut Chip8) {
         y += 1;
     }
 }
-fn op_e(opcode: u16, chip8: &mut Chip8) {}
-fn op_f(opcode: u16, chip8: &mut Chip8) {}
+
+// skip if key ops (delegate to the cpu)
+fn op_e(opcode: u16, chip8: &mut Chip8) {
+    match second_byte(&opcode) {
+        0x9e => todo!(),
+        0xa1 => todo!(),
+        _ => panic!("Error: Invalid instruction"),
+    }
+}
+fn op_f(opcode: u16, chip8: &mut Chip8) {
+    match second_byte(&opcode) {
+        // timers
+        0x07 => todo!(),
+        0x15 => todo!(),
+        0x18 => todo!(),
+
+        // add to index
+        0x1e => todo!(),
+
+        // get key
+        0x0a => todo!(),
+
+        // font char
+        0x29 => todo!(),
+
+        // binary -> decimal conversion
+        0x33 => todo!(),
+
+        // store mem
+        0x55 => todo!(),
+        // load mem
+        0x65 => todo!(),
+        _ => panic!("Error: Invalid instruction"),
+    }
+}
