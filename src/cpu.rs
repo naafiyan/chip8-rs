@@ -86,15 +86,12 @@ impl Chip8<'_> {
             (curr_instr_1 << 8) | curr_instr_2
         };
         self.state.pc += 2;
-        println!(
-            "Currently pressed down key {:?}",
-            self.key_input.borrow().get_curr_pressed_key()
-        );
 
         // handle timers
         self.delay_timer.decr_time_left();
         self.sound_timer.decr_time_left();
 
+        println!("{:04x}", curr_instr);
         instr::op(curr_instr, self);
 
         // simulate Chip8 speed
@@ -116,7 +113,7 @@ impl Chip8<'_> {
     pub fn load_to_ram(&mut self, instrs: &[u8]) {
         // load all the instructions into memory starting at 0x200
         let mut start = 0x200;
-        println!("Loading instructions: {:?}", instrs);
+        println!("Loading all instructions into RAM...");
         for instr in instrs {
             println!("curr instr: {:x?}", instr);
             self.ram[start] = instr.clone();

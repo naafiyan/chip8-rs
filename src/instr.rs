@@ -52,6 +52,10 @@ fn test_opcode_helpers() {
 pub fn op(opcode: u16, chip8: &mut Chip8) {
     // first nibble extracted by masking out last 3 nibbles
     // then bit shift by 12 (12 bits, i.e. 3 hex digits)
+
+    // -- DEBUG
+    instr_code_to_name(&opcode);
+
     let first_nibble = first_nib(&opcode);
     match first_nibble {
         0x0 => op_0(opcode, chip8),
@@ -320,4 +324,45 @@ fn op_f(opcode: u16, chip8: &mut Chip8) {
         0x65 => chip8.load_from_i(reg_num),
         _ => panic!("Error: Invalid instruction"),
     }
+}
+
+pub fn instr_code_to_name(opcode: &u16) {
+    let first_nibble = first_nib(&opcode);
+    let second_nib = second_nib(&opcode);
+    let third_nib = third_nib(&opcode);
+    let fourth_nib = fourth_nib(&opcode);
+
+    let first_byte = first_byte(&opcode);
+    let second_byte = second_byte(&opcode);
+    let addr = addr_bits(&opcode);
+
+    match first_nibble {
+        0x0 => {
+            if second_byte == 0xe0 {
+                println!("00E0: Clear Screen");
+            } else if second_byte == 0xee {
+                println!("00EE: Return");
+            }
+        }
+        0x1 => {
+            println!("0{:03x}: Jump {:03x}", addr, addr);
+        }
+        0x2 => {
+            println!("2{:03x}: Call {:03x}", addr, addr);
+        }
+        0x3 => {}
+        0x4 => {}
+        0x5 => {}
+        0x6 => {}
+        0x7 => {}
+        0x8 => {}
+        0x9 => {}
+        0xa => {}
+        0xb => {}
+        0xc => {}
+        0xd => {}
+        0xe => {}
+        0xf => {}
+        _ => println!("error: invalid opcode"),
+    };
 }
