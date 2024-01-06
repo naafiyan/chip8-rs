@@ -1,8 +1,10 @@
 mod cpu;
 mod display;
+mod emu_timer;
 mod instr;
 mod key_input;
 mod rom;
+mod utils;
 
 use cpu::Chip8;
 use sdl2::event::Event;
@@ -17,8 +19,13 @@ pub const NUM_COLS: u8 = 64;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let file_path = &args[1];
-    println!("Reading ROM into byte vec");
+    let file_path = {
+        match args.len() {
+            1 => "./chip8-roms/programs/IBM Logo.ch8",
+            2 => &args[1],
+            _ => panic!("Error: Usage chip8-rs 'IBM Logo.ch8'"),
+        }
+    };
 
     let sdl_context = sdl2::init().unwrap();
     let vid_subsystem = sdl_context.video().unwrap();
@@ -42,10 +49,13 @@ fn main() {
 
     let mut cpu = Chip8::new(&mut display, Rc::clone(&key_input));
     // load in rom file
-    let instrs = rom::read_rom(format!("./chip8-roms/programs/{}", file_path));
+    let instrs = rom::read_rom(file_path.to_string());
     cpu.load_to_ram(&instrs);
 
     let mut event_pump = sdl_context.event_pump().unwrap();
+
+    // TODO: technically this event loop can be done inside cpu
+    // TODO: this leads into broader idea of refactoring cpu?
     'running: loop {
         for event in event_pump.poll_iter() {
             match event {

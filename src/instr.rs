@@ -1,4 +1,4 @@
-use crate::cpu::Chip8;
+use crate::{cpu::Chip8, utils};
 use rand::Rng;
 
 fn first_nib(opcode: &u16) -> u16 {
@@ -266,35 +266,58 @@ fn op_d(opcode: u16, chip8: &mut Chip8) {
 
 // skip if key ops (delegate to the cpu)
 fn op_e(opcode: u16, chip8: &mut Chip8) {
+    let reg_num = second_nib(&opcode) as u8;
     match second_byte(&opcode) {
-        0x9e => todo!(),
-        0xa1 => todo!(),
+        0x9e => chip8.skip_if_key(reg_num, true),
+        0xa1 => chip8.skip_if_key(reg_num, false),
         _ => panic!("Error: Invalid instruction"),
     }
 }
 fn op_f(opcode: u16, chip8: &mut Chip8) {
+    let reg_num = second_nib(&opcode) as u8;
+    let reg_val = chip8.get_reg(reg_num);
     match second_byte(&opcode) {
         // timers
-        0x07 => todo!(),
-        0x15 => todo!(),
-        0x18 => todo!(),
+        0x07 => {
+            // set VX = delay_timer
+            chip8.set_reg(reg_num, chip8.delay_timer.get_time_left() as u8);
+        }
+        0x15 => chip8.delay_timer.set_time_left(reg_val.into()),
+        0x18 => chip8.sound_timer.set_time_left(reg_val.into()),
 
         // add to index
-        0x1e => todo!(),
+        0x1e => {
+            let i_reg_val = chip8.get_index_reg();
+            let res = i_reg_val + reg_val as u16;
+            chip8.set_index_reg(res);
+        }
 
-        // get key
-        0x0a => todo!(),
+        // block until key input
+        0x0a => {
+            chip8.block_till_key(reg_num);
+        }
 
         // font char
-        0x29 => todo!(),
+        0x29 => {
+            // index_reg I is set to address of hex char in VX
+            chip8.load_char_into_index_reg(reg_num);
+        }
 
-        // binary -> decimal conversion
-        0x33 => todo!(),
+        // binary-coded decimal conversion
+        0x33 => {
+            // takes reg_val and puts each digit into memory starting at I
+            chip8.store_from_i(utils::extract_digits_u8(reg_val));
+        }
 
         // store mem
-        0x55 => todo!(),
+        0x55 => {
+            // get all register values
+            let regs = chip8.get_regs_in_range(reg_num);
+            let vals = regs.into_iter().map(|r_num| chip8.get_reg(r_num)).collect();
+            chip8.store_from_i(vals);
+        }
         // load mem
-        0x65 => todo!(),
+        0x65 => chip8.load_from_i(reg_num),
         _ => panic!("Error: Invalid instruction"),
     }
 }
