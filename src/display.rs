@@ -61,7 +61,7 @@ impl Display {
     }
     pub fn display_update(&mut self) {
         if self.should_update {
-            self.pretty_print_display_grid();
+            // self.pretty_print_display_grid();
             self.draw_grid();
             self.should_update = false;
         }

@@ -52,6 +52,9 @@ fn main() {
     let instrs = rom::read_rom(file_path.to_string());
     cpu.load_to_ram(&instrs);
 
+    // -- DEBUG
+    cpu.inspect_ram();
+
     let mut event_pump = sdl_context.event_pump().unwrap();
 
     // TODO: technically this event loop can be done inside cpu

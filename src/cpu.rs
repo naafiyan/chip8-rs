@@ -91,7 +91,6 @@ impl Chip8<'_> {
         self.delay_timer.decr_time_left();
         self.sound_timer.decr_time_left();
 
-        println!("{:04x}", curr_instr);
         instr::op(curr_instr, self);
 
         // simulate Chip8 speed
@@ -113,11 +112,8 @@ impl Chip8<'_> {
     pub fn load_to_ram(&mut self, instrs: &[u8]) {
         // load all the instructions into memory starting at 0x200
         let mut start = 0x200;
-        println!("Loading all instructions into RAM...");
         for instr in instrs {
-            println!("curr instr: {:x?}", instr);
             self.ram[start] = instr.clone();
-            println!("curr ram[{}]: {:x?}", start, self.ram[start]);
             start += 1
         }
     }
@@ -126,9 +122,8 @@ impl Chip8<'_> {
     pub fn inspect_ram(&self) {
         println!("-----------------------------------");
         println!("DEBUG: Printing RAM contents");
-        println!("{:?}", self.ram);
         for (i, mem) in self.ram.iter().enumerate() {
-            println!("addr: {}, value: {:02x}", i, mem);
+            println!("addr: {:03x}, value: {:04x}", i, mem);
         }
     }
     pub fn stack_push_pc(&mut self) {
@@ -241,8 +236,9 @@ impl Chip8<'_> {
         }
     }
 
-    pub fn load_char_into_index_reg(&mut self, reg_num: u8) {
-        let addr_of_char = 0x050 + (reg_num * 6);
+    pub fn load_char_into_index_reg(&mut self, val: u8) {
+        let addr_of_char = 0x050 + (val * 5);
+        println!("Addr of char: {:04x}", addr_of_char);
         self.set_index_reg(addr_of_char.into());
     }
 }
