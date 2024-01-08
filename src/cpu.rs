@@ -202,7 +202,7 @@ impl Chip8<'_> {
 
     pub fn load_from_i(&mut self, num_regs: u8) {
         let curr_index: u16 = self.get_index_reg();
-        for i in 0..num_regs {
+        for i in 0..num_regs + 1 {
             let end = curr_index + (i as u16);
             self.state.v_regs[i as usize] = self.ram[end as usize];
         }
@@ -210,7 +210,7 @@ impl Chip8<'_> {
 
     pub fn get_regs_in_range(&self, range: u8) -> Vec<u8> {
         let r = range as usize;
-        self.state.v_regs[..r].to_vec()
+        self.state.v_regs[..r + 1].to_vec()
     }
 
     pub fn block_till_key(&mut self, reg_num: u8) {

@@ -52,6 +52,7 @@ fn test_opcode_helpers() {
 pub fn op(opcode: u16, chip8: &mut Chip8) {
     // first nibble extracted by masking out last 3 nibbles
     // then bit shift by 12 (12 bits, i.e. 3 hex digits)
+    println!("DEBUG: opcode: {:04x}", opcode);
     let first_nibble = first_nib(&opcode);
     match first_nibble {
         0x0 => op_0(opcode, chip8),
@@ -376,12 +377,28 @@ fn op_f(opcode: u16, chip8: &mut Chip8) {
         // store mem
         0x55 => {
             // get all register values
+
             let vals = chip8.get_regs_in_range(reg_num);
+            println!(
+                "{:04x}: SAVE from {:03x}, VALS {:?} from REGS V0->V{:01x}",
+                opcode,
+                chip8.get_index_reg(),
+                vals,
+                reg_num
+            );
             // let vals = regs.into_iter().map(|r_num| chip8.get_reg(r_num)).collect();
             chip8.store_from_i(vals);
         }
         // load mem
-        0x65 => chip8.load_from_i(reg_num),
+        0x65 => {
+            println!(
+                "{:04x}: LOAD from {:03x} INTO REGS V0->V{:01x}",
+                opcode,
+                chip8.get_index_reg(),
+                reg_num
+            );
+            chip8.load_from_i(reg_num)
+        }
         _ => panic!("Error: Invalid instruction"),
     }
 }
