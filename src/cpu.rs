@@ -27,7 +27,7 @@ const FONT_SET: [u8; 80] = [
 
 // 700 instructions per second
 // each instruction should then take 1000/700
-const CLOCK_CYCLE: Duration = Duration::from_nanos(1430);
+const CLOCK_CYCLE: Duration = Duration::from_millis(15);
 // 16 8-bit data registers named V0 to VF
 struct CPUState {
     v_regs: [u8; 16], // data regs
