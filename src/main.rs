@@ -33,8 +33,8 @@ fn main() {
     let window = vid_subsystem
         .window(
             "Chip8 Emulator",
-            (NUM_COLS as u32 * 10) as u32,
-            (NUM_ROWS as u32 * 10) as u32,
+            (NUM_COLS as u32 * 10),
+            (NUM_ROWS as u32 * 10),
         )
         .position_centered()
         .build()

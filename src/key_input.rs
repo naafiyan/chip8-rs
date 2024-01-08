@@ -37,6 +37,6 @@ pub fn chip8_keycode_map(kc: Keycode) -> Option<u8> {
         Keycode::D => Some(0xd),
         Keycode::E => Some(0xe),
         Keycode::F => Some(0xf),
-        _ => return None,
+        _ => None,
     }
 }

@@ -53,7 +53,7 @@ impl Display {
         println!("DEBUG: Printing DISPLAY GRID");
         for row in &self.buffer {
             for cell in row {
-                let symbol = if cell.clone() == 1 { 'X' } else { ' ' };
+                let symbol = if *cell == 1 { 'X' } else { ' ' };
                 print!("{}", symbol);
             }
             println!();

@@ -73,7 +73,7 @@ pub fn op(opcode: u16, chip8: &mut Chip8) {
         0xf => op_f(opcode, chip8),
         _ => println!("error: invalid opcode"),
     };
-    println!("");
+    println!();
 }
 
 fn op_0(opcode: u16, chip8: &mut Chip8) {

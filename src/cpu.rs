@@ -57,10 +57,10 @@ pub struct Chip8<'a> {
 
 // load in Chip8 memory starting at address 0x200
 impl Chip8<'_> {
-    pub fn new<'a>(
-        display: &'a mut display::Display,
+    pub fn new(
+        display: &mut display::Display,
         key_input: Rc<RefCell<key_input::KeyInput>>,
-    ) -> Chip8<'a> {
+    ) -> Chip8<'_> {
         // initialize the font system
         let mut ram = [0; 4096];
         ram[0x050..0x0A0].copy_from_slice(&FONT_SET);
@@ -113,7 +113,7 @@ impl Chip8<'_> {
         // load all the instructions into memory starting at 0x200
         let mut start = 0x200;
         for instr in instrs {
-            self.ram[start] = instr.clone();
+            self.ram[start] = *instr;
             start += 1
         }
     }
@@ -186,11 +186,9 @@ impl Chip8<'_> {
             if k != reg_key && !is_same {
                 self.incr_pc()
             }
-        } else {
-            if !is_same {
-                // no key => not same as key in VX
-                self.incr_pc()
-            }
+        } else if !is_same {
+            // no key => not same as key in VX
+            self.incr_pc()
         }
     }
 

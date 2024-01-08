@@ -1,6 +1,6 @@
 pub fn extract_digits_u8(mut num: u8) -> Vec<u8> {
     let mut digits = Vec::new();
-    while num.clone() > 0 {
+    while num > 0 {
         digits.push(num % 10);
         num /= 10;
     }
