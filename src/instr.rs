@@ -13,9 +13,12 @@ fn third_nib(opcode: &u16) -> u16 {
 fn fourth_nib(opcode: &u16) -> u16 {
     opcode & 0x000F
 }
+
+#[allow(dead_code)]
 fn first_byte(opcode: &u16) -> u16 {
     (opcode & 0xFF00) >> 8
 }
+
 fn second_byte(opcode: &u16) -> u16 {
     opcode & 0x00FF
 }

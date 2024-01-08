@@ -20,8 +20,4 @@ impl EmuTimer {
             self.time_left -= 1
         }
     }
-
-    pub fn incr_time_left(&mut self) {
-        self.time_left += 1
-    }
 }

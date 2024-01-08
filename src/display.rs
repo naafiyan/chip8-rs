@@ -48,6 +48,7 @@ impl Display {
         self.canvas.present();
     }
 
+    #[allow(dead_code)]
     pub fn pretty_print_display_grid(&self) {
         println!("-----------------------------------");
         println!("DEBUG: Printing DISPLAY GRID");
